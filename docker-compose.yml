@@ -1,0 +1,47 @@
+version: '3.8'
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: svc-backend-carrito-dev
+    restart: 'always'
+    ports:
+      - "8082:8080"
+    depends_on:
+      - database
+    networks:
+      my-network-carrito:
+        aliases:
+          - host-backend-dev
+
+  database:
+    image: mysql
+    container_name: svc-database-carrito-dev
+    restart: always
+    ports:
+      - 3309:3306
+    volumes:
+      - ./mysql_data/dev:/var/lib/mysql
+    environment:
+      MYSQL_DATABASE: carrito
+      MYSQL_ROOT_PASSWORD: 77289003
+      MYSQL_PASSWORD: 77289003
+      MYSQL_USER: sa
+      MYSQL_INITDB_SKIP_TZINFO: '1'
+      TZ: 'UTC' # Opcional: Ajusta la zona horaria según tus necesidades
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    networks:
+      my-network-backend-dev:
+        aliases:
+          - host-database-dev
+
+volumes:
+  mysql_data: {}
+
+networks:
+  my-network-carrito:
+    name: app-net-carrito-dev
+    driver: bridge
+    ipam:
+      driver: default
